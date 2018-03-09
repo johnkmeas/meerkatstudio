@@ -23,86 +23,29 @@ remove_action( 'genesis_before_loop', 'genesis_do_breadcrumbs' );
 remove_action( 'genesis_before_footer', 'genesis_footer_widget_areas' );
 
 
-add_action( 'genesis_entry_header', 'mk_hero_entry_header' );
-function mk_hero_entry_header() {
+add_action('genesis_entry_content', 'mk_meerkat_entry_content');
 
-    $hero = get_field('hero');
-
-    if( $hero ): ?>
-            <div class="hero-content">
-                <div><?php echo $hero['heading'] ?></div>
-                <div><?php echo $hero['subheading'] ?></div>
-                <?php echo $hero['caption']; ?>
-                <a href="<?php echo $hero['link']['url']; ?>"><?php echo $hero['link']['title']; ?></a>
+function mk_meerkat_entry_content() {
+    $args = [
+        'post_type'      => 'meerkat_projects',
+        'posts_per_page' => 10,
+    ];
+    $loop = new WP_Query($args);
+    ?>
+    <div class="container row">
+        <?php 
+        while ($loop->have_posts()) {
+            $loop->the_post();
+            ?>
+            <div class="project-entry-content col-12 col-md-3">
+                <h3 class="project-entry-title"><?php the_title(); ?></h3>
+                <?php the_post_thumbnail( 'featured-image' ); ?>
+                <?php the_content(); ?>
             </div>
-            <img class="hero-image" src="<?php echo $hero['image']['url']; ?>" alt="<?php echo $hero['image']['alt']; ?>" />
-
-    <?php endif;
+             <?php 
+        }?>
+    </div>
+<?php 
 }
-
-add_action('genesis_entry_content', 'mk_services_entry_content');
-
-function mk_services_entry_content() {
-    $services = get_field('services');
-    if( $services ): ?>
-
-
-            <div class="services">
-                <div><?php echo $services['heading'] ?></div>
-                <div><?php echo $services['copy'] ?></div>
-                <?php
-                if( have_rows('single_service') ):
-
-                    // loop through the rows of data
-                    while ( have_rows('single_service') ) : the_row();
-                        // display a sub field value
-                        the_sub_field('heading');
-                        the_sub_field('copy');
-                    endwhile;
-
-                else :
-
-                    // no rows found
-
-                endif; ?>
-            </div>
-
-    <?php endif;
-
-    echo '<p><strong>An extra line of text after the entry content</strong></p>';
-}
-
-add_action('genesis_entry_content', 'mk_process_entry_content');
-
-function mk_process_entry_content() {
-    $process = get_field('process');
-    if( $process ): ?>
-
-
-            <div class="mk_process">
-                <div><?php echo $process['heading'] ?></div>
-                <div><?php echo $process['copy'] ?></div>
-                <?php
-                if( have_rows('single_element_within_process') ):
-
-                    // loop through the rows of data
-                    while ( have_rows('single_element_within_process') ) : the_row();
-                        // display a sub field value
-                        the_sub_field('process_content');
-
-                    endwhile;
-
-                else :
-
-                    // no rows found
-
-                endif; ?>
-            </div>
-
-    <?php endif;
-
-
-}
-
 
 genesis();

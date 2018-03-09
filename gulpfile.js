@@ -5,12 +5,15 @@ const postcss = require('gulp-postcss');
 const autoprefixer = require('autoprefixer');
 const sourcemaps = require('gulp-sourcemaps');
 const groupmq = require('gulp-group-css-media-queries');
+const concatCss = require('gulp-concat-css');
+
 // const bs = require('browser-sync');bs
 const sassLint = require('gulp-sass-lint');
 
 const SASS_SOURCES = [
   './*.scss', // This picks up our style.scss file at the root of the theme
   'css/**/*.scss', // All other Sass files in the /css directory
+  // './node_modules/bootstrap/scss/mixins/_grid.scss',
 ];
 
 /**
@@ -31,13 +34,20 @@ gulp.task('compile:sass', ['lint:sass'], () =>
       })
     ]))
     .pipe(groupmq()) // Group media queries!
-    .pipe(gulp.dest('.')) // Output compiled files in the same dir as Sass sources
+    .pipe(gulp.dest('./dist/')) // Output compiled files in the same dir as Sass sources
     ); // Stream to browserSync
+
+
+gulp.task('compile:css',  () => {
+  return gulp.src(['./dist/style.css', './node_modules/bootstrap/dist/css/bootstrap-grid.css'])
+    .pipe(concatCss("./style.css"))
+    .pipe(gulp.dest('./'));
+});
 
 /**
  * Start up browserSync and watch Sass files for changes
  */
-gulp.task('watch:sass', ['compile:sass'], () => {
+gulp.task('watch:sass', ['compile:sass', 'compile:css'], () => {
   // bs.init({
   //   proxy: 'http://wp.docker.localhost:8000/'
   // });
